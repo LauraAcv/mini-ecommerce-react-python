@@ -10,7 +10,7 @@ interface ErrorMessageProps {
 export const ErrorMessage: React.FC<ErrorMessageProps> = ({ message }) => {
     return (
         <div className="error-message">
-            <p>⚠️ {message}</p>
+            <p>{message}</p>
         </div>
     );
 };

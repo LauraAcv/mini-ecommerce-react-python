@@ -12,6 +12,4 @@ const apiClient = axios.create({
     },
 });
 
-// Aquí se pueden agregar interceptors para manejo de errores, tokens, etc.
-
 export default apiClient;

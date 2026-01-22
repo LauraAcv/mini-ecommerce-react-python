@@ -12,12 +12,4 @@ export const productService = {
         const response = await apiClient.get<Product[]>('/products/');
         return response.data;
     },
-
-    /**
-     * Obtener un producto por ID (para futuro uso)
-     */
-    async getById(id: number): Promise<Product> {
-        const response = await apiClient.get<Product>(`/products/${id}/`);
-        return response.data;
-    },
 };

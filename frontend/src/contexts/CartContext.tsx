@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import type { ReactNode } from 'react';
 import type { CartItem } from '../types';
+import { cartStorage } from '../utils';
 
 interface CartContextType {
     items: CartItem[];
@@ -26,38 +27,69 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
 
     // Cargar carrito desde localStorage al montar
     useEffect(() => {
-        // TODO: Implementar carga desde localStorage
+        const savedCart = cartStorage.load();
+        if (savedCart && Array.isArray(savedCart)) {
+            setItems(savedCart);
+        }
     }, []);
 
     // Guardar carrito en localStorage cuando cambie
     useEffect(() => {
-        // TODO: Implementar guardado en localStorage
+        cartStorage.save(items);
     }, [items]);
 
-    const addItem = (_item: CartItem) => {
-        // TODO: Implementar lógica para agregar item
+    const addItem = (newItem: CartItem) => {
+        setItems((prevItems) => {
+            // Verificar si el producto ya existe en el carrito
+            const existingItemIndex = prevItems.findIndex(
+                (item) => item.product.id === newItem.product.id
+            );
+
+            if (existingItemIndex >= 0) {
+                // Si existe, incrementar cantidad
+                const updatedItems = [...prevItems];
+                updatedItems[existingItemIndex] = {
+                    ...updatedItems[existingItemIndex],
+                    quantity: updatedItems[existingItemIndex].quantity + newItem.quantity,
+                };
+                return updatedItems;
+            } else {
+                // Si no existe, agregar nuevo item
+                return [...prevItems, newItem];
+            }
+        });
     };
 
-    const removeItem = (_productId: number) => {
-        // TODO: Implementar lógica para remover item
+    const removeItem = (productId: number) => {
+        setItems((prevItems) => prevItems.filter((item) => item.product.id !== productId));
     };
 
-    const updateQuantity = (_productId: number, _quantity: number) => {
-        // TODO: Implementar lógica para actualizar cantidad
+    const updateQuantity = (productId: number, quantity: number) => {
+        if (quantity < 1) {
+            removeItem(productId);
+            return;
+        }
+
+        setItems((prevItems) =>
+            prevItems.map((item) =>
+                item.product.id === productId ? { ...item, quantity } : item
+            )
+        );
     };
 
     const clearCart = () => {
-        // TODO: Implementar lógica para limpiar carrito
+        setItems([]);
+        cartStorage.clear();
     };
 
     const getTotalItems = () => {
-        // TODO: Implementar cálculo de total de items
-        return 0;
+        return items.reduce((total, item) => total + item.quantity, 0);
     };
 
     const getTotalPrice = () => {
-        // TODO: Implementar cálculo de precio total
-        return 0;
+        return items.reduce((total, item) => {
+            return total + parseFloat(item.product.price) * item.quantity;
+        }, 0);
     };
 
     return (
