@@ -13,3 +13,6 @@ node_modules/
 # OS / Editor
 .DS_Store
 .vscode/
+
+# Django
+backend/db.sqlite3
